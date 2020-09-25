@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjetoLudis.Data;
-using ProjetoLudis.Models;
+using ProjetoLudis.Tabelas;
 using ProjetoLudis.Services;
 
 namespace ProjetoLudis.Controllers
@@ -32,13 +32,13 @@ namespace ProjetoLudis.Controllers
         /// <param name="email"></param>
         /// <param name="senha"></param>
         /// <returns></returns>
-        [HttpPost]
+  /*      [HttpPost]
         [Route("login")]
         [AllowAnonymous]
 
         public async Task<ActionResult<dynamic>> Authenticate([FromQuery] string email, [FromQuery] string senha)
         {
-            var usuario = _repo.GetUsuarioLogin(email, senha);
+           /* var usuario = _repo.GetUsuarioLogin(email, senha);
 
             if (usuario == null)
                 return NotFound(new { message = "Email ou Senha Invalída" });
@@ -49,6 +49,6 @@ namespace ProjetoLudis.Controllers
                 usuario = usuario,
                 token = token
             };
-        }
+        }*/
     }
 }

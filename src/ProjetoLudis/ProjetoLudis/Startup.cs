@@ -20,9 +20,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ProjetoLudis.Data;
-using ProjetoLudis.Models;
+using ProjetoLudis.Tabelas;
 using ProjetoLudis.Properties;
-using Swashbuckle.AspNetCore.Swagger;
+using ProjetoLudis.Options;
+using ProjetoLudis.Servicos.RotaServico;
+using ProjetoLudis.Servicos.RotaPontoServico;
 
 namespace ProjetoLudis
 {
@@ -35,37 +37,40 @@ namespace ProjetoLudis
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<RotaPontoServico>();
+            services.AddScoped<RotaServico>();
+
             services.AddEntityFrameworkNpgsql().AddDbContext<Context>(opt =>
                opt.UseNpgsql(Configuration.GetConnectionString("MyWebApiConnection")));
-            /*  services.AddDefaultIdentity<Usuario>()              
-                         .AddRoles<IdentityRole>    ()
+
+              services.AddDefaultIdentity<Usuario>()              
+                         .AddRoles<IdentityRole>()
                          .AddEntityFrameworkStores<Context>()
-                         .AddDefaultTokenProviders();*/
+                         .AddDefaultTokenProviders();
             services.AddVersionedApiExplorer(opt =>
             {
                 opt.GroupNameFormat = "'V'VVV";
                 opt.SubstituteApiVersionInUrl = true;
             })
-           .AddApiVersioning(opt => {
-               opt.DefaultApiVersion = new ApiVersion(1, 0);
-               opt.AssumeDefaultVersionWhenUnspecified = true;
-               opt.ReportApiVersions = true;
-           });
+            .AddApiVersioning(opt => {
+                opt.DefaultApiVersion = new ApiVersion(1, 0);
+                opt.AssumeDefaultVersionWhenUnspecified = true;
+                opt.ReportApiVersions = true;
+            });
 
             var apiProviderderDescription = services.BuildServiceProvider()
                                                     .GetService<IApiVersionDescriptionProvider>();
-
-            services.AddSwaggerGen(x =>
-            {
-                foreach (var description in apiProviderderDescription.ApiVersionDescriptions) {
+            services.AddSwaggerGen(x =>  {
+                foreach (var description in apiProviderderDescription.ApiVersionDescriptions)
+                {
                     x.SwaggerDoc(
-                        description.GroupName, 
-                        new Microsoft.OpenApi.Models.OpenApiInfo () { 
-                            Title = "AppLudis", 
-                            Version = description.ApiVersion.ToString() 
+                        description.GroupName,
+                        new Microsoft.OpenApi.Models.OpenApiInfo()
+                        {
+                            Title = "AppLudis",
+                            Version = description.ApiVersion.ToString()
                         }
                         );
                 }
@@ -90,17 +95,19 @@ namespace ProjetoLudis
                 var xmlCommentsFullPath = Path.Combine(AppContext.BaseDirectory, xmlCommentsFile);
                 x.IncludeXmlComments(xmlCommentsFullPath);
             });
-            services.AddCors();
-            services.AddControllers()
-                    .AddNewtonsoftJson(
-                        opt => opt.SerializerSettings.ReferenceLoopHandling =
-                            Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            services.AddControllers();                    
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(name: "CargaViewer", configurePolicy: builder => builder.RequireClaim("carga.view", allowedValues: "true"));
+                //options.AddPolicy("embarcador", policy => policy.RequireClaim("Store", "embarcador"));
+            });
 
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            var appSettingsSection = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
 
-            services.AddScoped<IRepository, Repository>();
+            var appSettings = appSettingsSection.Get<AppSettings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
 
-            var key = Encoding.ASCII.GetBytes(Settings.Secret);
             services.AddAuthentication(X =>
             {
                 X.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -114,10 +121,14 @@ namespace ProjetoLudis
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = appSettings.ValidoEm,
+                    ValidIssuer = appSettings.Emissor
                 };
-            });                  
+            });
+            services.AddControllers();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -130,10 +141,14 @@ namespace ProjetoLudis
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseHttpsRedirection();
+
+            app.UseStaticFiles();
+
             app.UseRouting();
 
-            var swaggerOptions = new SwaggerOptions();
-            Configuration.GetSection(nameof(SwaggerOptions)).Bind(swaggerOptions);
+         /*   var swaggerOptions = new SwaggerOptions();
+            Configuration.GetSection(nameof(SwaggerOptions)).Bind(swaggerOptions);*/
 
             app.UseSwagger();
 

@@ -188,3 +188,4 @@ C:\Projetos\Ludis\Back-End\src\ProjetoLudis\ProjetoLudis\bin\Debug\netcoreapp3.1
 C:\Projetos\Ludis\Back-End\src\ProjetoLudis\ProjetoLudis\obj\Debug\netcoreapp3.1\ProjetoLudis.csproj.CoreCompileInputs.cache
 C:\Projetos\Ludis\Back-End\src\ProjetoLudis\ProjetoLudis\obj\Debug\netcoreapp3.1\ProjetoLudis.MvcApplicationPartsAssemblyInfo.cs
 C:\Projetos\Ludis\Back-End\src\ProjetoLudis\ProjetoLudis\obj\Debug\netcoreapp3.1\ProjetoLudis.MvcApplicationPartsAssemblyInfo.cache
+C:\Projetos\Ludis\Back-End\src\ProjetoLudis\ProjetoLudis\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Caching.Memory.dll

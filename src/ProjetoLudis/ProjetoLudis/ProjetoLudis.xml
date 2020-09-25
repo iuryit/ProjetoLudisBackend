@@ -4,79 +4,10 @@
         <name>ProjetoLudis</name>
     </assembly>
     <members>
-        <member name="T:ProjetoLudis.Controllers.HomeController">
-            <summary>
-            Metodo de Login do sistema
-            </summary>
-        </member>
-        <member name="M:ProjetoLudis.Controllers.HomeController.#ctor(ProjetoLudis.Data.IRepository)">
-            <summary>
-            Metodo construtor
-            </summary>
-            <param name="repo"></param>
-        </member>
-        <member name="M:ProjetoLudis.Controllers.HomeController.Authenticate(System.String,System.String)">
-            <summary>
-            Metodo de validação de Usuario(Body => Email, Senha)
-            </summary>
-            <param name="email"></param>
-            <param name="senha"></param>
-            <returns></returns>
-        </member>
         <member name="T:ProjetoLudis.Controllers.UsuarioController">
             <summary>
             Metodos de  manipulação do Usuario 
             </summary>
-        </member>
-        <member name="M:ProjetoLudis.Controllers.UsuarioController.#ctor(ProjetoLudis.Data.IRepository,AutoMapper.IMapper)">
-            <summary>
-            Metodo construtor
-            </summary>
-            <param name="repo"></param>
-            <param name="mapper"></param>
-        </member>
-        <member name="M:ProjetoLudis.Controllers.UsuarioController.Get">
-            <summary>
-            Metodo para retorna todos os usuarios.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:ProjetoLudis.Controllers.UsuarioController.GetById(System.Int32)">
-            <summary>
-            Metodo para retorna somente um usuario(Query =>  Id).
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ProjetoLudis.Controllers.UsuarioController.Post(ProjetoLudis.Models.Usuario)">
-            <summary>
-            Metodo de inclusão de usuario(Body => Novo Usuario)
-            </summary>
-            <param name="model"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ProjetoLudis.Controllers.UsuarioController.Put(System.Int32,ProjetoLudis.Models.Usuario)">
-            <summary>
-            Metodo de alteração de todo usuario(Query => Id; Body => Usuario)
-            </summary>
-            <param name="id"></param>
-            <param name="model"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ProjetoLudis.Controllers.UsuarioController.Patch(System.Int32,ProjetoLudis.Models.Usuario)">
-            <summary>
-            Metodo de alteração parcial do usuario(Query => Id; Body => Usuario) 
-            </summary>
-            <param name="id"></param>
-            <param name="model"></param>
-            <returns></returns>
-        </member>
-        <member name="M:ProjetoLudis.Controllers.UsuarioController.Delete(System.Int32)">
-            <summary>
-            Metodo de Exclusao de Usuario(Quey => Id)
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
         </member>
     </members>
 </doc>

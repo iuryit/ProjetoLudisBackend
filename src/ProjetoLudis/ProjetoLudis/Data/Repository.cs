@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ProjetoLudis.Models;
+using ProjetoLudis.Tabelas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +36,7 @@ namespace ProjetoLudis.Data
             return (_context.SaveChanges() > 0);
         }
 
-        public Usuario[] GetAllUsuario()
+       /* public Usuario[] GetAllUsuario()
         {
             IQueryable<Usuario> query = _context.Usuarios;
 
@@ -98,6 +98,6 @@ namespace ProjetoLudis.Data
                          .Where(usuario => usuario.Senha == usuarioSenha);
 
             return query.FirstOrDefault();
-        }
+        }*/
     }
 }

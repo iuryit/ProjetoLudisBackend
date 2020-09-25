@@ -1,5 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using ProjetoLudis.Models;
+using ProjetoLudis.Tabelas;
 using ProjetoLudis.Properties;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace ProjetoLudis.Services
 {
     public static class TokenService
     {
-        public static string GenerateToken(Usuario usuario)
+      /*  public static string GenerateToken(Usuario usuario)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Settings.Secret);
@@ -31,6 +31,6 @@ namespace ProjetoLudis.Services
             return tokenHandler.WriteToken(token);
 
 
-        }
+        }*/
     }
 }

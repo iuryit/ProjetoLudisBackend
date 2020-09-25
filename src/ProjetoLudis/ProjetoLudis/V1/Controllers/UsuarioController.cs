@@ -1,4 +1,4 @@
-﻿
+﻿    
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ProjetoLudis.Tabelas;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using ProjetoLudis.Options;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 using ProjetoLudis.Models;
 
 namespace ProjetoLudis.Controllers
@@ -16,138 +24,121 @@ namespace ProjetoLudis.Controllers
     /// <summary>
     /// Metodos de  manipulação do Usuario 
     /// </summary>
+    [Route("api/[controller]")]
     [ApiController]
-    [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]")]
     public class UsuarioController : ControllerBase
     {
-        public readonly IRepository _repo;
-            
-        private readonly IMapper _mapper;
-        /// <summary>
-        /// Metodo construtor
-        /// </summary>
-        /// <param name="repo"></param>
-        /// <param name="mapper"></param>
-        public UsuarioController(IRepository repo, IMapper mapper)
+        private readonly SignInManager<Usuario> _signInManager;
+        private readonly UserManager<Usuario> _userManager;
+        private readonly AppSettings _appSettings;
+
+        public UsuarioController(SignInManager<Usuario> signInManager,
+                              UserManager<Usuario> userManager,
+                              IOptions<AppSettings> appSettings)
         {
-            _mapper = mapper;
-            _repo = repo;
+            _signInManager = signInManager;
+            _userManager = userManager;
+            _appSettings = appSettings.Value;
         }
-        /// <summary>
-        /// Metodo para retorna todos os usuarios.
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        [Authorize]
-        public IActionResult Get()
+
+        [HttpPost("nova-conta")]
+        public async Task<ActionResult> Registrar(RegisterUserViewModels registerUser)
         {
-            var usuarios = _repo.GetAllUsuario();
-            return Ok(_mapper.Map<IEnumerable<Usuario>>(usuarios));
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(e => e.Errors));
 
-        }
-        /// <summary>
-        /// Metodo para retorna somente um usuario(Query =>  Id).
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("{id}")]
-        [Authorize]
-        public IActionResult GetById(int id)
-        {
-            var usuario = _repo.GetUsuarioById(id);
-            if (usuario == null) return BadRequest("Usuario não encontrado");
+            var newUseId = Guid.NewGuid();
 
-            var Usuario = _mapper.Map<Usuario>(usuario);
+            var user = new Usuario
 
-            return Ok(Usuario);
-
-        }
-        /// <summary>
-        /// Metodo de inclusão de usuario(Body => Novo Usuario)
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Authorize]
-        public IActionResult Post(Usuario model)
-        {
-            var usuario = _mapper.Map<Usuario>(model);
-
-            _repo.Add(usuario);
-            if (_repo.SaveChanges())
             {
-                return Created($"/api/usuario/{model.Id}", _mapper.Map<Usuario>(usuario));
+
+                Id = newUseId.ToString(),
+                UserName = registerUser.Email,
+                Email = registerUser.Email,
+                EmailConfirmed = true
+               /* Telefone = registerUser.Telefone,
+                Endereco = registerUser.Endereco,
+                CEP = registerUser.CEP,
+                Cidade = registerUser.Cidade,
+                Bairro = registerUser.Bairro,
+                Nome = registerUser.Nome,
+                Complemento = registerUser.Complemento,
+                UF = registerUser.UF,
+                IdEsportista = registerUser.IdEsportista,
+                IdComerciante = registerUser.IdComerciante*/
+
+
+            };
+
+            var result = await _userManager.CreateAsync(user, registerUser.Password);
+
+            if (!result.Succeeded) return BadRequest(result.Errors);
+
+            await _signInManager.SignInAsync(user, false);
+
+            await _userManager.AddClaimAsync(user, new Claim(type: "carga.view", value: "true"));
+
+
+            return Ok(await GerarJwt(registerUser.Email));
+        }
+
+        [HttpPost("entrar")]
+        public async Task<ActionResult> Login(LoginUserViewModel loginUser)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values.SelectMany(e => e.Errors));
+
+            var result = await _signInManager.PasswordSignInAsync(loginUser.Email, loginUser.Password, false, true);
+
+            if (result.Succeeded)
+            {
+                return Ok(await GerarJwt(loginUser.Email));
             }
 
-            return BadRequest("Usuario não cadastrado");
+            return BadRequest("Usuário ou senha inválidos");
         }
-        /// <summary>
-        /// Metodo de alteração de todo usuario(Query => Id; Body => Usuario)
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPut("{id}")]
-        [Authorize]
-        public IActionResult Put(int id, Usuario model)
+
+        private async Task<string> GerarJwt(string email)
         {
-            var usuario = _repo.GetUsuarioById(id);
-            if (usuario == null) return BadRequest("Usuario não encontrado");
+            var user = await _userManager.FindByEmailAsync(email);
 
-            _mapper.Map(model, usuario);
+            var identityClaims = new ClaimsIdentity();
+            identityClaims.AddClaims(await _userManager.GetClaimsAsync(user));
 
-            _repo.Update(usuario);
-            if (_repo.SaveChanges())
+            // authentication successful so generate jwt token
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+
+            var claims = new List<Claim> {
+            new Claim(type: JwtRegisteredClaimNames.Email, value:user.Email),
+            new Claim(type: JwtRegisteredClaimNames.Jti, value:Guid.NewGuid().ToString()),
+            new Claim(type: JwtRegisteredClaimNames.Sub, value:user.Email),
+            new Claim(type:"id", value:user.Id),
+            new Claim(type:"Expira em", value:DateTime.UtcNow.AddHours(_appSettings.ExpiracaoHoras).ToString()),
+
+
+             };
+
+            var userClaims = await _userManager.GetClaimsAsync(user);
+
+            claims.AddRange(userClaims);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
             {
-                return Created($"/api/usuario/{model.Id}", _mapper.Map<Usuario>(usuario));
-            }
+                Subject = new ClaimsIdentity(claims),
 
-            return BadRequest("Usuario não atualizado");
+                //Subject = new ClaimsIdentity(new[]
+                //{
+                //    new Claim(ClaimTypes.Name, user.Id)
+                //}),
+
+                Issuer = _appSettings.Emissor,
+                Audience = _appSettings.ValidoEm,
+                // Expires = DateTime.UtcNow.AddHours(_appSettings.ExpiracaoHoras),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            return tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
         }
-        /// <summary>
-        /// Metodo de alteração parcial do usuario(Query => Id; Body => Usuario) 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPatch("{id}")]
-        [Authorize]
-        public IActionResult Patch(int id, Usuario model)
-        {
-            var usuario = _repo.GetUsuarioById(id);
-            if (usuario == null) return BadRequest("Ususario não encontrado");
-
-            _mapper.Map(model, usuario);
-
-            _repo.Update(usuario);
-            if (_repo.SaveChanges())
-            {
-                return Created($"/api/usuario/{model.Id}", _mapper.Map<Usuario>(usuario));
-            }
-
-            return BadRequest("Usuario não atualizado");
-        }
-        /// <summary>
-        /// Metodo de Exclusao de Usuario(Quey => Id)
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpDelete("{id}")]
-        [Authorize]
-        public IActionResult Delete(int id)
-        {
-            var usuario = _repo.GetUsuarioById(id);
-            if (usuario == null) return BadRequest("Usuario não encontrado");
-
-
-            _repo.Delete(usuario);
-            if (_repo.SaveChanges())
-            {
-                return Ok("Usuario deletado");
-            }
-
-            return BadRequest("Usuario não deletado");
-        }
+       
     }
 }
