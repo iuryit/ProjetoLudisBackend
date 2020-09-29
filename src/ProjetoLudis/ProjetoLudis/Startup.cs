@@ -22,8 +22,6 @@ using ProjetoLudis.Data;
 using ProjetoLudis.Tabelas;
 using ProjetoLudis.Properties;
 using ProjetoLudis.Options;
-using ProjetoLudis.Servicos.RotaServico;
-using ProjetoLudis.Servicos.RotaPontoServico;
 
 namespace ProjetoLudis
 {
@@ -38,8 +36,6 @@ namespace ProjetoLudis
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<RotaPontoServico>();
-            services.AddScoped<RotaServico>();
             services.AddEntityFrameworkNpgsql().AddDbContext<Context>(opt =>
                opt.UseNpgsql(Configuration.GetConnectionString("MyWebApiConnection")));
             services.AddDefaultIdentity<IdentityUser>()              
