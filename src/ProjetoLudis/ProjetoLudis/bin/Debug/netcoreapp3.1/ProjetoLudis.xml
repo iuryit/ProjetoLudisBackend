@@ -4,10 +4,5 @@
         <name>ProjetoLudis</name>
     </assembly>
     <members>
-        <member name="T:ProjetoLudis.Controllers.UsuarioController">
-            <summary>
-            Metodos de  manipulação do Usuario 
-            </summary>
-        </member>
     </members>
 </doc>

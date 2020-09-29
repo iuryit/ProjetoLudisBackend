@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -41,15 +40,14 @@ namespace ProjetoLudis
         {
             services.AddScoped<RotaPontoServico>();
             services.AddScoped<RotaServico>();
-
             services.AddEntityFrameworkNpgsql().AddDbContext<Context>(opt =>
                opt.UseNpgsql(Configuration.GetConnectionString("MyWebApiConnection")));
-
-              services.AddDefaultIdentity<Usuario>()              
+            services.AddDefaultIdentity<IdentityUser>()              
                          .AddRoles<IdentityRole>()
                          .AddEntityFrameworkStores<Context>()
                          .AddDefaultTokenProviders();
-            services.AddVersionedApiExplorer(opt =>
+
+            /*services.AddVersionedApiExplorer(opt =>
             {
                 opt.GroupNameFormat = "'V'VVV";
                 opt.SubstituteApiVersionInUrl = true;
@@ -58,22 +56,12 @@ namespace ProjetoLudis
                 opt.DefaultApiVersion = new ApiVersion(1, 0);
                 opt.AssumeDefaultVersionWhenUnspecified = true;
                 opt.ReportApiVersions = true;
-            });
+            });*/
 
-            var apiProviderderDescription = services.BuildServiceProvider()
-                                                    .GetService<IApiVersionDescriptionProvider>();
+           /* var apiProviderderDescription = services.BuildServiceProvider()
+                                                    .GetService<IApiVersionDescriptionProvider>();*/
             services.AddSwaggerGen(x =>  {
-                foreach (var description in apiProviderderDescription.ApiVersionDescriptions)
-                {
-                    x.SwaggerDoc(
-                        description.GroupName,
-                        new Microsoft.OpenApi.Models.OpenApiInfo()
-                        {
-                            Title = "AppLudis",
-                            Version = description.ApiVersion.ToString()
-                        }
-                        );
-                }
+                x.SwaggerDoc("v1", new OpenApiInfo { Title = "AppOcr", Version = "v1" });
                 x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = "JWT Authorization header usando o esquema bearer",
@@ -90,12 +78,8 @@ namespace ProjetoLudis
                         Type = ReferenceType.SecurityScheme
                     }}, new List<string>()}
                 });
-
-                var xmlCommentsFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlCommentsFullPath = Path.Combine(AppContext.BaseDirectory, xmlCommentsFile);
-                x.IncludeXmlComments(xmlCommentsFullPath);
             });
-            services.AddControllers();                    
+            services.AddControllers();
             services.AddAuthorization(options =>
             {
                 options.AddPolicy(name: "CargaViewer", configurePolicy: builder => builder.RequireClaim("carga.view", allowedValues: "true"));
@@ -133,8 +117,8 @@ namespace ProjetoLudis
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, 
-                              IWebHostEnvironment env,
-                              IApiVersionDescriptionProvider apiProviderderDescription)
+                              IWebHostEnvironment env
+                              )
         {
             if (env.IsDevelopment())
             {
@@ -147,25 +131,16 @@ namespace ProjetoLudis
 
             app.UseRouting();
 
-         /*   var swaggerOptions = new SwaggerOptions();
-            Configuration.GetSection(nameof(SwaggerOptions)).Bind(swaggerOptions);*/
+            var swaggerOptions = new SwaggerOptions();
+            Configuration.GetSection(nameof(SwaggerOptions)).Bind(swaggerOptions);
 
             app.UseSwagger();
 
             app.UseSwaggerUI(opt =>
             {
-                foreach (var description in apiProviderderDescription.ApiVersionDescriptions)
-                {
-                    opt.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
-                }
-                opt.RoutePrefix = "";
+                opt.SwaggerEndpoint("/swagger/v1/swagger.json", "TesteApi V1");
 
             });
-
-            app.UseCors(x => x
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader());
 
             app.UseAuthentication();
             app.UseAuthorization();

@@ -19,7 +19,7 @@ namespace ProjetoLudis.Models
         [Compare("Password", ErrorMessage = "As senhas não conferem.")]
         public string ConfirmPassword { get; set; }
 
-       /* public string Telefone { get; set; }
+        public string Telefone { get; set; }
 
         public string Endereco { get; set; }
 
@@ -34,10 +34,6 @@ namespace ProjetoLudis.Models
         public string Complemento { get; set; }
 
         public string UF { get; set; }
-
-        public int IdEsportista { get; set; }
-
-        public int IdComerciante { get; set; }*/
 
 
     }

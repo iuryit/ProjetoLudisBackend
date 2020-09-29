@@ -18,6 +18,6 @@ namespace ProjetoLudis.Data
         public DbSet<Rota> RotaDb { get; set; }
         public DbSet<RotaPonto> RotaPontoDb { get; set; }
 
-        public DbSet<IdentityUser> Usuario { get; set; }
+        //public DbSet<IdentityUser> Usuario { get; set; }
     }
 }

@@ -1,5 +1,4 @@
 ﻿    
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ProjetoLudis.Tabelas;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using ProjetoLudis.Options;
@@ -21,19 +19,16 @@ using ProjetoLudis.Models;
 
 namespace ProjetoLudis.Controllers
 {
-    /// <summary>
-    /// Metodos de  manipulação do Usuario 
-    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class UsuarioController : ControllerBase
     {
-        private readonly SignInManager<Usuario> _signInManager;
-        private readonly UserManager<Usuario> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<IdentityUser> _userManager;
         private readonly AppSettings _appSettings;
 
-        public UsuarioController(SignInManager<Usuario> signInManager,
-                              UserManager<Usuario> userManager,
+        public UsuarioController(SignInManager<IdentityUser> signInManager,
+                              UserManager<IdentityUser> userManager,
                               IOptions<AppSettings> appSettings)
         {
             _signInManager = signInManager;
@@ -48,26 +43,25 @@ namespace ProjetoLudis.Controllers
 
             var newUseId = Guid.NewGuid();
 
-            var user = new Usuario
+            var user = new IdentityUser
 
             {
-
                 Id = newUseId.ToString(),
                 UserName = registerUser.Email,
                 Email = registerUser.Email,
-                EmailConfirmed = true
+                EmailConfirmed = true,
                /* Telefone = registerUser.Telefone,
                 Endereco = registerUser.Endereco,
                 CEP = registerUser.CEP,
                 Cidade = registerUser.Cidade,
                 Bairro = registerUser.Bairro,
                 Nome = registerUser.Nome,
-                Complemento = registerUser.Complemento,
+                Complemento = registerUser.Complemento, 
                 UF = registerUser.UF,
                 IdEsportista = registerUser.IdEsportista,
-                IdComerciante = registerUser.IdComerciante*/
+                IdComerciante = registerUser.IdComerciante,*/
 
-
+                
             };
 
             var result = await _userManager.CreateAsync(user, registerUser.Password);

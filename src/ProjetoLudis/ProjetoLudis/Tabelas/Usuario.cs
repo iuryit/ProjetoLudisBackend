@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ProjetoLudis.Tabelas
 {
-    public class Usuario : IdentityUser
+    public class Usuario
     {
        /* public Usuario(){}
 
@@ -38,13 +38,15 @@ namespace ProjetoLudis.Tabelas
             this.IdEsportista = idEsportista;
             this.IdComerciante = IdComerciante;
 
-        }
-        [Key]*/
-      //  public int Id { get; set; }
+        }*/
+        [Key]
+        public Guid Id { get; set; }
 
-      //  public string Email { get; set; }
+        public int IdUsuario { get; set; }
 
-      /*  public string? Telefone { get; set; }
+        //  public string Email { get; set; }
+
+        /*public string? Telefone { get; set; }
 
         public string? Endereco { get; set; }
 
