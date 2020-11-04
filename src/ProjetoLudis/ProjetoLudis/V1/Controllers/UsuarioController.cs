@@ -16,6 +16,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using ProjetoLudis.Models;
+using ProjetoLudis.Tabelas;
 
 namespace ProjetoLudis.Controllers
 {
@@ -23,17 +24,26 @@ namespace ProjetoLudis.Controllers
     [ApiController]
     public class UsuarioController : ControllerBase
     {
+        public readonly IRepository _repo;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly AppSettings _appSettings;
+        private readonly Context _context;
 
         public UsuarioController(SignInManager<IdentityUser> signInManager,
                               UserManager<IdentityUser> userManager,
+                              RoleManager<IdentityRole> roleManager,
+                              IRepository repo,
+                              Context context,
                               IOptions<AppSettings> appSettings)
         {
+            _roleManager = roleManager;
             _signInManager = signInManager;
             _userManager = userManager;
             _appSettings = appSettings.Value;
+            _context = context;
+            _repo = repo;
         }
 
         [HttpPost("nova-conta")]
@@ -43,26 +53,16 @@ namespace ProjetoLudis.Controllers
 
             var newUseId = Guid.NewGuid();
 
-            var user = new IdentityUser
+            var user = new Usuario
 
             {
                 Id = newUseId.ToString(),
                 UserName = registerUser.Email,
                 Email = registerUser.Email,
                 EmailConfirmed = true,
-               /* Telefone = registerUser.Telefone,
-                Endereco = registerUser.Endereco,
-                CEP = registerUser.CEP,
-                Cidade = registerUser.Cidade,
-                Bairro = registerUser.Bairro,
-                Nome = registerUser.Nome,
-                Complemento = registerUser.Complemento, 
-                UF = registerUser.UF,
-                IdEsportista = registerUser.IdEsportista,
-                IdComerciante = registerUser.IdComerciante,*/
 
-                
-            };
+        };
+
 
             var result = await _userManager.CreateAsync(user, registerUser.Password);
 
@@ -70,10 +70,8 @@ namespace ProjetoLudis.Controllers
 
             await _signInManager.SignInAsync(user, false);
 
-            await _userManager.AddClaimAsync(user, new Claim(type: "carga.view", value: "true"));
-
-
-            return Ok(await GerarJwt(registerUser.Email));
+            return Ok("Usuario Criado com sucesso");
+           // return Ok(await GerarJwt(registerUser.Email));
         }
 
         [HttpPost("entrar")]
@@ -85,8 +83,34 @@ namespace ProjetoLudis.Controllers
 
             if (result.Succeeded)
             {
-                return Ok(await GerarJwt(loginUser.Email));
+                var user = await _userManager.FindByEmailAsync(loginUser.Email);
+                var userClaims = await _userManager.GetRolesAsync(user);
+               // return Ok(user);
+                // Verifico se o usario tem role
+                foreach (var claim in userClaims)
+                {
+                    //Caso tenha e seja esportista,
+                    if (claim == "Esportista")
+                    {
+                        var usuario = _context.Usuarios.AsNoTracking().Where(X => X.Id == user.Id).FirstOrDefault();
+                        var Retorno = _repo.GetUsuarioEsportistaId(usuario.IdIdentidade).Result;
+                        Retorno.Token = await GerarJwt(loginUser.Email);
+                        return Ok(Retorno);
+                    }
+                    //Caso tenha e seja comerciante,
+                    else if (claim == "Comerciante")
+                    {
+                        var usuario = _context.Usuarios.AsNoTracking().Where(X => X.Id == user.Id).FirstOrDefault();
+                        var Retorno = _repo.GetUsuarioComercianteId(usuario.IdIdentidade).Result;
+                        Retorno.Token = await GerarJwt(loginUser.Email);
+                        return Ok(Retorno);
+                    }                   
+                }
+                // caso não tenha
+                return BadRequest("Usuario não vinculado a Função. Defina se você é um Esportsta ou Comerciante.");              
             }
+
+           
 
             return BadRequest("Usuário ou senha inválidos");
         }
@@ -112,6 +136,11 @@ namespace ProjetoLudis.Controllers
 
              };
 
+
+            // Get User roles and add them to claims
+            var roles = await _userManager.GetRolesAsync(user);
+            AddRolesToClaims(claims, roles);
+
             var userClaims = await _userManager.GetClaimsAsync(user);
 
             claims.AddRange(userClaims);
@@ -119,11 +148,6 @@ namespace ProjetoLudis.Controllers
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-
-                //Subject = new ClaimsIdentity(new[]
-                //{
-                //    new Claim(ClaimTypes.Name, user.Id)
-                //}),
 
                 Issuer = _appSettings.Emissor,
                 Audience = _appSettings.ValidoEm,
@@ -133,6 +157,15 @@ namespace ProjetoLudis.Controllers
 
             return tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
         }
-       
+
+        private void AddRolesToClaims(List<Claim> claims, IEnumerable<string> roles)
+        {
+            foreach (var role in roles)
+            {
+                var roleClaim = new Claim(ClaimTypes.Role, role);
+                claims.Add(roleClaim);
+            }
+        }
+
     }
 }

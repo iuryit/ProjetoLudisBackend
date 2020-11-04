@@ -38,26 +38,16 @@ namespace ProjetoLudis
         {
             services.AddEntityFrameworkNpgsql().AddDbContext<Context>(opt =>
                opt.UseNpgsql(Configuration.GetConnectionString("MyWebApiConnection")));
+
+            services.AddScoped<IRepository, Repository>();
+
             services.AddDefaultIdentity<IdentityUser>()              
                          .AddRoles<IdentityRole>()
                          .AddEntityFrameworkStores<Context>()
                          .AddDefaultTokenProviders();
 
-            /*services.AddVersionedApiExplorer(opt =>
-            {
-                opt.GroupNameFormat = "'V'VVV";
-                opt.SubstituteApiVersionInUrl = true;
-            })
-            .AddApiVersioning(opt => {
-                opt.DefaultApiVersion = new ApiVersion(1, 0);
-                opt.AssumeDefaultVersionWhenUnspecified = true;
-                opt.ReportApiVersions = true;
-            });*/
-
-           /* var apiProviderderDescription = services.BuildServiceProvider()
-                                                    .GetService<IApiVersionDescriptionProvider>();*/
             services.AddSwaggerGen(x =>  {
-                x.SwaggerDoc("v1", new OpenApiInfo { Title = "AppOcr", Version = "v1" });
+                x.SwaggerDoc("v1", new OpenApiInfo { Title = "AppLudis", Version = "v1" });
                 x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = "JWT Authorization header usando o esquema bearer",
@@ -79,8 +69,12 @@ namespace ProjetoLudis
             services.AddAuthorization(options =>
             {
                 options.AddPolicy(name: "CargaViewer", configurePolicy: builder => builder.RequireClaim("carga.view", allowedValues: "true"));
-                //options.AddPolicy("embarcador", policy => policy.RequireClaim("Store", "embarcador"));
             });
+
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options =>
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
 
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
@@ -134,7 +128,7 @@ namespace ProjetoLudis
 
             app.UseSwaggerUI(opt =>
             {
-                opt.SwaggerEndpoint("/swagger/v1/swagger.json", "TesteApi V1");
+                opt.SwaggerEndpoint("/swagger/v1/swagger.json", "Api V1");
 
             });
 

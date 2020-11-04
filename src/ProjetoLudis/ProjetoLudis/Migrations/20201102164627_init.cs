@@ -40,7 +40,9 @@ namespace ProjetoLudis.Migrations
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false)
+                    AccessFailedCount = table.Column<int>(nullable: false),
+                    Discriminator = table.Column<string>(nullable: false),
+                    IdIdentidade = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -53,12 +55,20 @@ namespace ProjetoLudis.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Nome = table.Column<string>(nullable: true),
                     RazaoSocial = table.Column<string>(nullable: true),
                     CPFCNPJ = table.Column<string>(nullable: true),
                     InscricaoEstadual = table.Column<string>(nullable: true),
                     InscricaoMunicipal = table.Column<string>(nullable: true),
                     IndicadorIE = table.Column<int>(nullable: false),
-                    Regime = table.Column<int>(nullable: false)
+                    Regime = table.Column<int>(nullable: false),
+                    Telefone = table.Column<string>(nullable: true),
+                    Endereco = table.Column<string>(nullable: true),
+                    CEP = table.Column<string>(nullable: true),
+                    Cidade = table.Column<string>(nullable: true),
+                    Bairro = table.Column<string>(nullable: true),
+                    Complemento = table.Column<string>(nullable: true),
+                    UF = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -71,42 +81,19 @@ namespace ProjetoLudis.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    CPF = table.Column<string>(nullable: true)
+                    Nome = table.Column<string>(nullable: true),
+                    CPF = table.Column<string>(nullable: true),
+                    Telefone = table.Column<string>(nullable: true),
+                    Endereco = table.Column<string>(nullable: true),
+                    CEP = table.Column<string>(nullable: true),
+                    Cidade = table.Column<string>(nullable: true),
+                    Bairro = table.Column<string>(nullable: true),
+                    Complemento = table.Column<string>(nullable: true),
+                    UF = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Esportistas", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RotaDb",
-                columns: table => new
-                {
-                    IdRota = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Origem = table.Column<string>(nullable: true),
-                    Destino = table.Column<string>(nullable: true),
-                    Pontos = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RotaDb", x => x.IdRota);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RotaPontoDb",
-                columns: table => new
-                {
-                    IdRotaPonto = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Descricao = table.Column<string>(nullable: true),
-                    Latitude = table.Column<string>(nullable: true),
-                    Longitude = table.Column<string>(nullable: true),
-                    CategoriaPonto = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RotaPontoDb", x => x.IdRotaPonto);
                 });
 
             migrationBuilder.CreateTable(
@@ -275,12 +262,6 @@ namespace ProjetoLudis.Migrations
 
             migrationBuilder.DropTable(
                 name: "Esportistas");
-
-            migrationBuilder.DropTable(
-                name: "RotaDb");
-
-            migrationBuilder.DropTable(
-                name: "RotaPontoDb");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

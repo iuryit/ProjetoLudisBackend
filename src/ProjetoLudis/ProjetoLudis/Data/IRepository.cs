@@ -1,4 +1,5 @@
-﻿using ProjetoLudis.Tabelas;
+﻿using ProjetoLudis.Dtos;
+using ProjetoLudis.Tabelas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +14,10 @@ namespace ProjetoLudis.Data
         void Delete<T>(T entity) where T : class;
         bool SaveChanges();
 
-       /* Usuario[] GetAllUsuario();
-        Usuario[] GetAllUsuarioByComercianteId(int comercianteId);
-        Usuario[] GetAllUsuarioByEsportistaId(int esportistaId);
-        Usuario GetUsuarioById(int UsuarioId);
-        Usuario GetUsuarioLogin(string usurarioEmail, string usuarioSenha);*/
+        Task<UsuarioComerciante[]> GetAllUsuarioComerciante();
+        Task<UsuarioEsportista[]> GetAllUsuarioEsportista();
+        Task<UsuarioComerciante> GetUsuarioComercianteId(int comercianteId);
+        Task<UsuarioEsportista> GetUsuarioEsportistaId(int esportistaId);
 
 
     }

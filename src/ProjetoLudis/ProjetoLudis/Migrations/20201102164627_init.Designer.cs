@@ -10,7 +10,7 @@ using ProjetoLudis.Data;
 namespace ProjetoLudis.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20200925030719_init")]
+    [Migration("20201102164627_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -83,6 +83,10 @@ namespace ProjetoLudis.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("text");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Email")
                         .HasColumnType("character varying(256)")
                         .HasMaxLength(256);
@@ -133,6 +137,8 @@ namespace ProjetoLudis.Migrations
                         .HasName("UserNameIndex");
 
                     b.ToTable("AspNetUsers");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -226,7 +232,22 @@ namespace ProjetoLudis.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<string>("Bairro")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CEP")
+                        .HasColumnType("text");
+
                     b.Property<string>("CPFCNPJ")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Cidade")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Complemento")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Endereco")
                         .HasColumnType("text");
 
                     b.Property<int>("IndicadorIE")
@@ -238,11 +259,20 @@ namespace ProjetoLudis.Migrations
                     b.Property<string>("InscricaoMunicipal")
                         .HasColumnType("text");
 
+                    b.Property<string>("Nome")
+                        .HasColumnType("text");
+
                     b.Property<string>("RazaoSocial")
                         .HasColumnType("text");
 
                     b.Property<int>("Regime")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Telefone")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UF")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -256,7 +286,31 @@ namespace ProjetoLudis.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<string>("Bairro")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CEP")
+                        .HasColumnType("text");
+
                     b.Property<string>("CPF")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Cidade")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Complemento")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Endereco")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Nome")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Telefone")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UF")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -264,49 +318,14 @@ namespace ProjetoLudis.Migrations
                     b.ToTable("Esportistas");
                 });
 
-            modelBuilder.Entity("ProjetoLudis.Tabelas.Rota", b =>
+            modelBuilder.Entity("ProjetoLudis.Tabelas.Usuario", b =>
                 {
-                    b.Property<int>("IdRota")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
-                    b.Property<string>("Destino")
-                        .HasColumnType("text");
+                    b.Property<int>("IdIdentidade")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Origem")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Pontos")
-                        .HasColumnType("text");
-
-                    b.HasKey("IdRota");
-
-                    b.ToTable("RotaDb");
-                });
-
-            modelBuilder.Entity("ProjetoLudis.Tabelas.RotaPonto", b =>
-                {
-                    b.Property<int>("IdRotaPonto")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("CategoriaPonto")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Descricao")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Latitude")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Longitude")
-                        .HasColumnType("text");
-
-                    b.HasKey("IdRotaPonto");
-
-                    b.ToTable("RotaPontoDb");
+                    b.HasDiscriminator().HasValue("Usuario");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -4,15 +4,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+using ProjetoLudis.Dtos;
+using Microsoft.AspNetCore.Identity;
 
 namespace ProjetoLudis.Data
 {
     public class Repository : IRepository
     {
+        private readonly UserManager<IdentityUser> _userManager;
         private readonly Context _context;
-        public Repository(Context context)
+
+        public Repository(Context context, UserManager<IdentityUser> userManager)
         {
+            _userManager = userManager;
             _context = context;
         }
 
@@ -36,68 +40,188 @@ namespace ProjetoLudis.Data
             return (_context.SaveChanges() > 0);
         }
 
-       /* public Usuario[] GetAllUsuario()
+        public async Task<UsuarioComerciante[]> GetAllUsuarioComerciante()
         {
-            IQueryable<Usuario> query = _context.Usuarios;
+            IQueryable<Comerciante> queryItens = _context.Comerciantes;
 
-            query = query.Include(a => a.Esportista)
-                         .Include(a => a.Comerciante);   
+            var UsuarioComercianteList = new List<UsuarioComerciante>();
 
-            query = query.AsNoTracking().OrderBy(a => a.Id);
+            foreach (var query in queryItens.ToArray().ToList()) {
 
-            return query.ToArray();
+                var UsuarioComerciante = new UsuarioComerciante();
+
+                UsuarioComerciante.Id = query.Id;
+                UsuarioComerciante.Bairro = query.Bairro;
+                UsuarioComerciante.CEP = query.CEP;
+                UsuarioComerciante.Cidade = query.Cidade;
+                UsuarioComerciante.Complemento = query.Complemento;
+                UsuarioComerciante.CPFCNPJ = query.CPFCNPJ;
+                UsuarioComerciante.Endereco = query.Endereco;
+                UsuarioComerciante.IndicadorIE = query.IndicadorIE;
+                UsuarioComerciante.InscricaoEstadual = query.InscricaoEstadual;
+                UsuarioComerciante.InscricaoMunicipal = query.InscricaoMunicipal;
+                UsuarioComerciante.Nome = query.Nome;
+                UsuarioComerciante.RazaoSocial = query.RazaoSocial;
+                UsuarioComerciante.Regime = query.Regime;
+                UsuarioComerciante.Telefone = query.Telefone;
+                UsuarioComerciante.UF = query.UF;
+
+                IQueryable<Usuario> queryUserItens = _context.Usuarios;
+                queryUserItens = queryUserItens.AsNoTracking()
+                        .Where(usuario => usuario.IdIdentidade == query.Id);
+
+                foreach (var queryUser in queryUserItens.ToArray().ToList())
+                {
+                    var userClaims = await _userManager.GetRolesAsync(queryUser);
+
+                    foreach (var claim in userClaims)
+                    {
+                        if (claim == "Comerciante")
+                        {
+                            UsuarioComerciante.Email = queryUser.Email;
+                            UsuarioComerciante.Senha = queryUser.PasswordHash;
+                        }
+                    }
+                }
+                UsuarioComercianteList.Add(UsuarioComerciante);
+            }
+
+            return UsuarioComercianteList.ToArray();
         }
 
-        public Usuario[] GetAllUsuarioByComercianteId(int comercianteId)
+        public async Task<UsuarioEsportista[]> GetAllUsuarioEsportista()
         {
-            IQueryable<Usuario> query = _context.Usuarios;
+            IQueryable<Esportista> queryItens = _context.Esportistas;
 
-            query = query.Include(a => a.Comerciante);
+            var UsuarioEsportistaList = new List<UsuarioEsportista>();
 
-            query = query.AsNoTracking()
-                         .OrderBy(A => A.Id)
-                         .Where(usuario => usuario.Comerciante.Id == comercianteId);
+            foreach (var query in queryItens.ToArray().ToList())
+            {
 
-            return query.ToArray();
+                var UsuarioEsportista = new UsuarioEsportista();
+
+                UsuarioEsportista.Id = query.Id;
+                UsuarioEsportista.Bairro = query.Bairro;
+                UsuarioEsportista.CEP = query.CEP;
+                UsuarioEsportista.Cidade = query.Cidade;
+                UsuarioEsportista.Complemento = query.Complemento;
+                UsuarioEsportista.CPF = query.CPF;
+                UsuarioEsportista.Endereco = query.Endereco;
+                UsuarioEsportista.Nome = query.Nome;
+                UsuarioEsportista.Telefone = query.Telefone;
+                UsuarioEsportista.UF = query.UF;
+
+                IQueryable<Usuario> queryUserItens = _context.Usuarios;
+                queryUserItens = queryUserItens.AsNoTracking()
+                        .Where(usuario => usuario.IdIdentidade == query.Id);
+
+                foreach (var queryUser in queryUserItens.ToArray().ToList())
+                {
+                    var userClaims = await _userManager.GetRolesAsync(queryUser);
+
+                    foreach (var claim in userClaims)
+                    {
+                        if (claim == "Esportista")
+                        {
+                            UsuarioEsportista.Email = queryUser.Email;
+                            UsuarioEsportista.Senha = queryUser.PasswordHash;
+                        }
+                    }
+                }
+                UsuarioEsportistaList.Add(UsuarioEsportista);
+            }
+
+            return UsuarioEsportistaList.ToArray();
         }
 
-        public Usuario[] GetAllUsuarioByEsportistaId(int esportistaId)
+        public async Task<UsuarioComerciante> GetUsuarioComercianteId(int comercianteId)
         {
-            IQueryable<Usuario> query = _context.Usuarios;
+            IQueryable<Comerciante> queryitens = _context.Comerciantes;
 
-            query = query.Include(a => a.Esportista);
+            Comerciante query = queryitens.AsNoTracking()
+                    .Where(comerciante => comerciante.Id == comercianteId).FirstOrDefault();
 
-            query = query.AsNoTracking()
-                         .OrderBy(A => A.Id)
-                         .Where(usuario => usuario.Esportista.Id == esportistaId);
+            var UsuarioComerciante = new UsuarioComerciante();
 
-            return query.ToArray();
+            UsuarioComerciante.Id = query.Id;
+            UsuarioComerciante.Bairro = query.Bairro;
+            UsuarioComerciante.CEP = query.CEP;
+            UsuarioComerciante.Cidade = query.Cidade;
+            UsuarioComerciante.Complemento = query.Complemento;
+            UsuarioComerciante.CPFCNPJ = query.CPFCNPJ;
+            UsuarioComerciante.Endereco = query.Endereco;
+            UsuarioComerciante.IndicadorIE = query.IndicadorIE;
+            UsuarioComerciante.InscricaoEstadual = query.InscricaoEstadual;
+            UsuarioComerciante.InscricaoMunicipal = query.InscricaoMunicipal;
+            UsuarioComerciante.Nome = query.Nome;
+            UsuarioComerciante.RazaoSocial = query.RazaoSocial;
+            UsuarioComerciante.Regime = query.Regime;
+            UsuarioComerciante.Telefone = query.Telefone;
+            UsuarioComerciante.UF = query.UF;
+
+
+            IQueryable<Usuario> queryUserItens = _context.Usuarios;
+            queryUserItens = queryUserItens.AsNoTracking()
+                               .Where(usuario => usuario.IdIdentidade == query.Id);
+
+            foreach (var queryUser in queryUserItens.ToArray().ToList())
+            {
+                var userClaims = await _userManager.GetRolesAsync(queryUser);
+
+                foreach (var claim in userClaims)
+                {
+                    if (claim == "Comerciante")
+                    {
+                        UsuarioComerciante.Email = queryUser.Email;
+                        UsuarioComerciante.Senha = queryUser.PasswordHash;
+                    }
+                }
+            }         
+
+            return UsuarioComerciante;
         }
 
-        public Usuario GetUsuarioById(int UsuarioId)
+        public async Task<UsuarioEsportista> GetUsuarioEsportistaId(int esportistaId)
         {
-            IQueryable<Usuario> query = _context.Usuarios;
+            IQueryable<Esportista> queryitens = _context.Esportistas;
 
-            query = query.Include(a => a.Esportista)
-                         .Include(a => a.Comerciante);
+            Esportista query = queryitens.AsNoTracking()
+                    .Where(comerciante => comerciante.Id == esportistaId).FirstOrDefault();
 
-            query = query.AsNoTracking()
-                         .OrderBy(A => A.Id)
-                         .Where(usuario => usuario.Id == UsuarioId);
+            var UsuarioEsportista = new UsuarioEsportista();
 
-            return query.FirstOrDefault();
+            UsuarioEsportista.Id = query.Id;
+            UsuarioEsportista.Bairro = query.Bairro;
+            UsuarioEsportista.CEP = query.CEP;
+            UsuarioEsportista.Cidade = query.Cidade;
+            UsuarioEsportista.Complemento = query.Complemento;
+            UsuarioEsportista.CPF = query.CPF;
+            UsuarioEsportista.Endereco = query.Endereco;
+            UsuarioEsportista.Nome = query.Nome;
+            UsuarioEsportista.Telefone = query.Telefone;
+            UsuarioEsportista.UF = query.UF;
+
+
+            IQueryable<Usuario> queryUserItens = _context.Usuarios;
+            queryUserItens = queryUserItens.AsNoTracking()
+                               .Where(usuario => usuario.IdIdentidade == query.Id);
+
+            foreach (var queryUser in queryUserItens.ToArray().ToList())
+            {
+                var userClaims = await _userManager.GetRolesAsync(queryUser);
+
+                foreach (var claim in userClaims)
+                {
+                    if (claim == "Esportista")
+                    {
+                        UsuarioEsportista.Email = queryUser.Email;
+                        UsuarioEsportista.Senha = queryUser.PasswordHash;
+                    }
+                }
+            }
+
+            return UsuarioEsportista;
         }
-
-        public Usuario GetUsuarioLogin(string usurarioEmail, string usuarioSenha)
-        {
-            IQueryable<Usuario> query = _context.Usuarios;
-
-            query = query.AsNoTracking()
-                         .OrderBy(A => A.Id)
-                         .Where(usuario => usuario.Email == usurarioEmail)
-                         .Where(usuario => usuario.Senha == usuarioSenha);
-
-            return query.FirstOrDefault();
-        }*/
+       
     }
 }
