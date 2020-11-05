@@ -202,6 +202,33 @@ namespace ProjetoLudis.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Quadras",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Nome = table.Column<string>(nullable: true),
+                    Telefone = table.Column<string>(nullable: true),
+                    Endereco = table.Column<string>(nullable: true),
+                    CEP = table.Column<string>(nullable: true),
+                    Cidade = table.Column<string>(nullable: true),
+                    Bairro = table.Column<string>(nullable: true),
+                    Complemento = table.Column<string>(nullable: true),
+                    UF = table.Column<string>(nullable: true),
+                    ComercianteId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Quadras", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Quadras_Comerciantes_ComercianteId",
+                        column: x => x.ComercianteId,
+                        principalTable: "Comerciantes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -238,6 +265,11 @@ namespace ProjetoLudis.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Quadras_ComercianteId",
+                table: "Quadras",
+                column: "ComercianteId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -258,16 +290,19 @@ namespace ProjetoLudis.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Comerciantes");
+                name: "Esportistas");
 
             migrationBuilder.DropTable(
-                name: "Esportistas");
+                name: "Quadras");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Comerciantes");
         }
     }
 }

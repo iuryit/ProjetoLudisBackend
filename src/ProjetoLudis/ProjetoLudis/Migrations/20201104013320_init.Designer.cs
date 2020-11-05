@@ -10,7 +10,7 @@ using ProjetoLudis.Data;
 namespace ProjetoLudis.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20201102164627_init")]
+    [Migration("20201104013320_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -318,6 +318,47 @@ namespace ProjetoLudis.Migrations
                     b.ToTable("Esportistas");
                 });
 
+            modelBuilder.Entity("ProjetoLudis.Tabelas.Quadra", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("Bairro")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CEP")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Cidade")
+                        .HasColumnType("text");
+
+                    b.Property<int>("ComercianteId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Complemento")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Endereco")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Nome")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Telefone")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UF")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ComercianteId");
+
+                    b.ToTable("Quadras");
+                });
+
             modelBuilder.Entity("ProjetoLudis.Tabelas.Usuario", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
@@ -375,6 +416,15 @@ namespace ProjetoLudis.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ProjetoLudis.Tabelas.Quadra", b =>
+                {
+                    b.HasOne("ProjetoLudis.Tabelas.Comerciante", "Comerciante")
+                        .WithMany("Quadras")
+                        .HasForeignKey("ComercianteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

@@ -5,26 +5,20 @@ using System.Threading.Tasks;
 
 namespace ProjetoLudis.Tabelas
 {
-    public class Comerciante
+    public class Quadra
     {
-        public Comerciante(){}
+        public Quadra() { }
 
-        public Comerciante(int id,
-                           string razaoSocial,
-                           string cpfCnpj,
-                           int  regime,
+        public Quadra(int id,
                            string nome,
                            string telefone,
                            string cep,
                            string cidade,
                            string endereco,
                            string bairro,
-                           string uf)                            
+                           string uf)
         {
             this.Id = id;
-            this.RazaoSocial = razaoSocial;
-            this.CPFCNPJ = cpfCnpj;
-            this.Regime = regime;
             this.Nome = nome;
             this.Telefone = telefone;
             this.CEP = cep;
@@ -38,18 +32,6 @@ namespace ProjetoLudis.Tabelas
         public int Id { get; set; }
 
         public string? Nome { get; set; }
-
-        public string RazaoSocial { get; set; }
-
-        public string CPFCNPJ { get; set; }
-
-        public string InscricaoEstadual { get; set; } = " ";
-                
-        public string InscricaoMunicipal { get; set; } = " ";
-
-        public int IndicadorIE { get; set; } = 0;
-
-        public int Regime { get; set; }
 
         public string? Telefone { get; set; }
 
@@ -65,11 +47,8 @@ namespace ProjetoLudis.Tabelas
 
         public string? UF { get; set; }
 
-        public IEnumerable<Quadra> Quadras { get; set; }
+        public int ComercianteId { get; set; }
 
-        internal bool Any(Func<object, bool> p)
-        {
-            throw new NotImplementedException();
-        }
+        public Comerciante Comerciante { get; set; }
     }
 }

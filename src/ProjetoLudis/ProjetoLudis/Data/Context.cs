@@ -15,6 +15,7 @@ namespace ProjetoLudis.Data
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Esportista> Esportistas { get; set; }
         public DbSet<Comerciante> Comerciantes { get; set; }
+        public DbSet<Quadra> Quadras { get; set; }
 
         //public DbSet<IdentityUser> Usuario { get; set; }
     }

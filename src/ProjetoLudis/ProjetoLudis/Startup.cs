@@ -22,6 +22,7 @@ using ProjetoLudis.Data;
 using ProjetoLudis.Tabelas;
 using ProjetoLudis.Properties;
 using ProjetoLudis.Options;
+using AutoMapper;
 
 namespace ProjetoLudis
 {
@@ -38,6 +39,8 @@ namespace ProjetoLudis
         {
             services.AddEntityFrameworkNpgsql().AddDbContext<Context>(opt =>
                opt.UseNpgsql(Configuration.GetConnectionString("MyWebApiConnection")));
+
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddScoped<IRepository, Repository>();
 
@@ -132,7 +135,13 @@ namespace ProjetoLudis
 
             });
 
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+
             app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
