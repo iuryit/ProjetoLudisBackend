@@ -23,6 +23,8 @@ namespace Ludis.API.Helpers
 
             CreateMap<Quadra, QuadraRegistrar>().ReverseMap();
 
-    }
+            CreateMap<AgendaQuadra, QuadraAgendar>().ReverseMap();
+
+        }
     }
 }

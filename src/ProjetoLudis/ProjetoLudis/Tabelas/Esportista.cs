@@ -16,6 +16,7 @@ namespace ProjetoLudis.Tabelas
                           string cep,
                           string cidade,
                           string endereco,
+                          string numero,
                           string bairro,
                           string uf)
         {
@@ -26,6 +27,8 @@ namespace ProjetoLudis.Tabelas
             this.CEP = cep;
             this.Cidade = cidade;
             this.Endereco = endereco;
+            this.Endereco = endereco;
+            this.Numero = numero;
             this.Bairro = bairro;
             this.UF = uf;
         }
@@ -39,6 +42,8 @@ namespace ProjetoLudis.Tabelas
         public string? Telefone { get; set; }
 
         public string? Endereco { get; set; }
+
+        public string? Numero { get; set; }
 
         public string? CEP { get; set; }
 

@@ -15,6 +15,7 @@ namespace ProjetoLudis.Tabelas
                            string cep,
                            string cidade,
                            string endereco,
+                           string numero,
                            string bairro,
                            string uf)
         {
@@ -24,6 +25,7 @@ namespace ProjetoLudis.Tabelas
             this.CEP = cep;
             this.Cidade = cidade;
             this.Endereco = endereco;
+            this.Numero = numero;
             this.Bairro = bairro;
             this.UF = uf;
 
@@ -37,6 +39,8 @@ namespace ProjetoLudis.Tabelas
 
         public string? Endereco { get; set; }
 
+        public string? Numero { get; set; }
+
         public string? CEP { get; set; }
 
         public string? Cidade { get; set; }
@@ -47,8 +51,12 @@ namespace ProjetoLudis.Tabelas
 
         public string? UF { get; set; }
 
+        public string Descricao { get; set; }
+
         public int ComercianteId { get; set; }
 
         public Comerciante Comerciante { get; set; }
+
+        public IEnumerable<QuadraEsportes> QuadraEsportes { get; set; }
     }
 }

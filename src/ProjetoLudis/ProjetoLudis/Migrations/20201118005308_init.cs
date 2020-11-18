@@ -64,6 +64,7 @@ namespace ProjetoLudis.Migrations
                     Regime = table.Column<int>(nullable: false),
                     Telefone = table.Column<string>(nullable: true),
                     Endereco = table.Column<string>(nullable: true),
+                    Numero = table.Column<string>(nullable: true),
                     CEP = table.Column<string>(nullable: true),
                     Cidade = table.Column<string>(nullable: true),
                     Bairro = table.Column<string>(nullable: true),
@@ -76,6 +77,19 @@ namespace ProjetoLudis.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Esportes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Nome = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Esportes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Esportistas",
                 columns: table => new
                 {
@@ -85,6 +99,7 @@ namespace ProjetoLudis.Migrations
                     CPF = table.Column<string>(nullable: true),
                     Telefone = table.Column<string>(nullable: true),
                     Endereco = table.Column<string>(nullable: true),
+                    Numero = table.Column<string>(nullable: true),
                     CEP = table.Column<string>(nullable: true),
                     Cidade = table.Column<string>(nullable: true),
                     Bairro = table.Column<string>(nullable: true),
@@ -211,11 +226,13 @@ namespace ProjetoLudis.Migrations
                     Nome = table.Column<string>(nullable: true),
                     Telefone = table.Column<string>(nullable: true),
                     Endereco = table.Column<string>(nullable: true),
+                    Numero = table.Column<string>(nullable: true),
                     CEP = table.Column<string>(nullable: true),
                     Cidade = table.Column<string>(nullable: true),
                     Bairro = table.Column<string>(nullable: true),
                     Complemento = table.Column<string>(nullable: true),
                     UF = table.Column<string>(nullable: true),
+                    Descricao = table.Column<string>(nullable: true),
                     ComercianteId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -228,6 +245,83 @@ namespace ProjetoLudis.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "AgendaQuadras",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    HoraInicio = table.Column<DateTime>(nullable: false),
+                    HoraFim = table.Column<DateTime>(nullable: false),
+                    EsporteId = table.Column<int>(nullable: false),
+                    Descricao = table.Column<string>(nullable: true),
+                    QuadraId = table.Column<int>(nullable: false),
+                    EsportistaId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AgendaQuadras", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AgendaQuadras_Esportes_EsporteId",
+                        column: x => x.EsporteId,
+                        principalTable: "Esportes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AgendaQuadras_Esportistas_EsportistaId",
+                        column: x => x.EsportistaId,
+                        principalTable: "Esportistas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AgendaQuadras_Quadras_QuadraId",
+                        column: x => x.QuadraId,
+                        principalTable: "Quadras",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "QuadraEsportes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    EsporteId = table.Column<int>(nullable: false),
+                    QuadraId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuadraEsportes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_QuadraEsportes_Esportes_EsporteId",
+                        column: x => x.EsporteId,
+                        principalTable: "Esportes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_QuadraEsportes_Quadras_QuadraId",
+                        column: x => x.QuadraId,
+                        principalTable: "Quadras",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AgendaQuadras_EsporteId",
+                table: "AgendaQuadras",
+                column: "EsporteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AgendaQuadras_EsportistaId",
+                table: "AgendaQuadras",
+                column: "EsportistaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AgendaQuadras_QuadraId",
+                table: "AgendaQuadras",
+                column: "QuadraId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -267,6 +361,16 @@ namespace ProjetoLudis.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_QuadraEsportes_EsporteId",
+                table: "QuadraEsportes",
+                column: "EsporteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuadraEsportes_QuadraId",
+                table: "QuadraEsportes",
+                column: "QuadraId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Quadras_ComercianteId",
                 table: "Quadras",
                 column: "ComercianteId");
@@ -274,6 +378,9 @@ namespace ProjetoLudis.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AgendaQuadras");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -290,16 +397,22 @@ namespace ProjetoLudis.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Esportistas");
+                name: "QuadraEsportes");
 
             migrationBuilder.DropTable(
-                name: "Quadras");
+                name: "Esportistas");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Esportes");
+
+            migrationBuilder.DropTable(
+                name: "Quadras");
 
             migrationBuilder.DropTable(
                 name: "Comerciantes");

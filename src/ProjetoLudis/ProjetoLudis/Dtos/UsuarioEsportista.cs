@@ -22,6 +22,8 @@ namespace ProjetoLudis.Dtos
 
         public string Endereco { get; set; }
 
+        public string Numero { get; set; }
+
         public string CEP { get; set; }
 
         public string Cidade { get; set; }

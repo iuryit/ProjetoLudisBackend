@@ -13,6 +13,8 @@ namespace ProjetoLudis.Dtos
 
         public string? Endereco { get; set; }
 
+        public string? Numero { get; set; }
+
         public string? CEP { get; set; }
 
         public string? Cidade { get; set; }
@@ -22,7 +24,5 @@ namespace ProjetoLudis.Dtos
         public string? Complemento { get; set; }
 
         public string? UF { get; set; }
-
-        public int ComercianteId { get; set; }
     }
 }

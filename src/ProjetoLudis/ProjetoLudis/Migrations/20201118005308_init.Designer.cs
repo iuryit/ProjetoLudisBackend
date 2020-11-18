@@ -10,7 +10,7 @@ using ProjetoLudis.Data;
 namespace ProjetoLudis.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20201104013320_init")]
+    [Migration("20201118005308_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -225,6 +225,42 @@ namespace ProjetoLudis.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("ProjetoLudis.Tabelas.AgendaQuadra", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("Descricao")
+                        .HasColumnType("text");
+
+                    b.Property<int>("EsporteId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("EsportistaId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("HoraFim")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("HoraInicio")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("QuadraId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EsporteId");
+
+                    b.HasIndex("EsportistaId");
+
+                    b.HasIndex("QuadraId");
+
+                    b.ToTable("AgendaQuadras");
+                });
+
             modelBuilder.Entity("ProjetoLudis.Tabelas.Comerciante", b =>
                 {
                     b.Property<int>("Id")
@@ -262,6 +298,9 @@ namespace ProjetoLudis.Migrations
                     b.Property<string>("Nome")
                         .HasColumnType("text");
 
+                    b.Property<string>("Numero")
+                        .HasColumnType("text");
+
                     b.Property<string>("RazaoSocial")
                         .HasColumnType("text");
 
@@ -277,6 +316,21 @@ namespace ProjetoLudis.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Comerciantes");
+                });
+
+            modelBuilder.Entity("ProjetoLudis.Tabelas.Esporte", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("Nome")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Esportes");
                 });
 
             modelBuilder.Entity("ProjetoLudis.Tabelas.Esportista", b =>
@@ -305,6 +359,9 @@ namespace ProjetoLudis.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Nome")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Numero")
                         .HasColumnType("text");
 
                     b.Property<string>("Telefone")
@@ -340,10 +397,16 @@ namespace ProjetoLudis.Migrations
                     b.Property<string>("Complemento")
                         .HasColumnType("text");
 
+                    b.Property<string>("Descricao")
+                        .HasColumnType("text");
+
                     b.Property<string>("Endereco")
                         .HasColumnType("text");
 
                     b.Property<string>("Nome")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Numero")
                         .HasColumnType("text");
 
                     b.Property<string>("Telefone")
@@ -357,6 +420,28 @@ namespace ProjetoLudis.Migrations
                     b.HasIndex("ComercianteId");
 
                     b.ToTable("Quadras");
+                });
+
+            modelBuilder.Entity("ProjetoLudis.Tabelas.QuadraEsportes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<int>("EsporteId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("QuadraId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EsporteId");
+
+                    b.HasIndex("QuadraId");
+
+                    b.ToTable("QuadraEsportes");
                 });
 
             modelBuilder.Entity("ProjetoLudis.Tabelas.Usuario", b =>
@@ -420,11 +505,47 @@ namespace ProjetoLudis.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ProjetoLudis.Tabelas.AgendaQuadra", b =>
+                {
+                    b.HasOne("ProjetoLudis.Tabelas.Esporte", "Esporte")
+                        .WithMany()
+                        .HasForeignKey("EsporteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjetoLudis.Tabelas.Esportista", "Esportista")
+                        .WithMany()
+                        .HasForeignKey("EsportistaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjetoLudis.Tabelas.Quadra", "Quadra")
+                        .WithMany()
+                        .HasForeignKey("QuadraId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ProjetoLudis.Tabelas.Quadra", b =>
                 {
                     b.HasOne("ProjetoLudis.Tabelas.Comerciante", "Comerciante")
                         .WithMany("Quadras")
                         .HasForeignKey("ComercianteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ProjetoLudis.Tabelas.QuadraEsportes", b =>
+                {
+                    b.HasOne("ProjetoLudis.Tabelas.Esporte", "Esporte")
+                        .WithMany()
+                        .HasForeignKey("EsporteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjetoLudis.Tabelas.Quadra", "Quadra")
+                        .WithMany("QuadraEsportes")
+                        .HasForeignKey("QuadraId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using ProjetoLudis.Dtos;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace ProjetoLudis.Data
 {
@@ -13,11 +15,14 @@ namespace ProjetoLudis.Data
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly Context _context;
+        private readonly AuthenticatedUser _user;
 
-        public Repository(Context context, UserManager<IdentityUser> userManager)
+
+        public Repository(Context context, UserManager<IdentityUser> userManager, AuthenticatedUser user)
         {
             _userManager = userManager;
             _context = context;
+            _user = user;
         }
 
         public void Add<T>(T entity) where T : class
@@ -46,7 +51,8 @@ namespace ProjetoLudis.Data
 
             var UsuarioComercianteList = new List<UsuarioComerciante>();
 
-            foreach (var query in queryItens.ToArray().ToList()) {
+            foreach (var query in queryItens.ToArray().ToList())
+            {
 
                 var UsuarioComerciante = new UsuarioComerciante();
 
@@ -176,7 +182,7 @@ namespace ProjetoLudis.Data
                         UsuarioComerciante.Senha = queryUser.PasswordHash;
                     }
                 }
-            }         
+            }
 
             return UsuarioComerciante;
         }
@@ -222,6 +228,117 @@ namespace ProjetoLudis.Data
 
             return UsuarioEsportista;
         }
-       
+
+        public bool VerificaHorarioDisponivel(DateTime agenHoraInicio, DateTime agenHoraFim)
+        {
+
+            IQueryable<AgendaQuadra> query = _context.AgendaQuadras;
+
+            AgendaQuadra result = query.AsNoTracking()
+                    .Where(agenda => agenda.HoraInicio >= agenHoraInicio)
+                    .Where(agenda => agenda.HoraFim <= agenHoraInicio)
+                    .FirstOrDefault();
+
+            if (result != null)
+            {
+                return false;
+            }
+
+            result = query.AsNoTracking()
+                   .Where(agenda => agenda.HoraInicio >= agenHoraFim)
+                   .Where(agenda => agenda.HoraFim <= agenHoraFim)
+                   .FirstOrDefault();
+
+            if (result != null)
+            {
+                return false;
+            }
+
+            return true;
+
+        }
+
+        public Quadra[] GetQuadraLocalizacao(string cidadeQuadra, string nomeQuadra = null)
+        {
+            IQueryable<Quadra> query = _context.Quadras;
+
+            var quadra = query.AsNoTracking()
+                    .Where(X => X.Cidade.Contains(cidadeQuadra));
+
+            if (nomeQuadra != null)
+            {
+                quadra = quadra.Where(X => X.Nome.Contains(nomeQuadra));
+            }
+
+            return quadra.ToArray(); ;
+        }
+
+        public async Task<int> GetIdComercianteLogado()
+        {
+            var user = await _userManager.FindByEmailAsync(_user.Name);
+
+            IQueryable<Usuario> usuario = _context.Usuarios;
+            var result = usuario.AsNoTracking()
+                               .Where(usuario => usuario.Id == user.Id).FirstOrDefault();
+
+            var userClaims = await _userManager.GetRolesAsync(result);
+
+            foreach (var claim in userClaims)
+            {
+                if (claim == "Comerciante")
+                {
+                    return result.IdIdentidade;
+                }
+            }
+
+            return 0;
+        }
+
+        public async Task<int> GetIdEsportistaLogado()
+        {
+            var user = await _userManager.FindByEmailAsync(_user.Name); 
+
+            IQueryable<Usuario> usuario = _context.Usuarios;
+            var result = usuario.AsNoTracking()
+                               .Where(usuario => usuario.Id == user.Id).FirstOrDefault();
+
+            var userClaims = await _userManager.GetRolesAsync(result);
+
+            foreach (var claim in userClaims)
+            {
+                if (claim == "Esportista")
+                {
+                    return result.IdIdentidade;
+                }
+            }
+
+            return 0;
+        }
+
+        public Quadra[] GetQuadrasComerciante(int idComerciante)
+        {
+            IQueryable<Quadra> query = _context.Quadras;
+
+            var quadra = query.AsNoTracking()
+                    .Where(X => X.ComercianteId == idComerciante);
+
+            return quadra.ToArray();
+        }
+
+        public AgendaQuadra[] GetQuadraHorariosAgendados(int idQuadra, DateTime? dia )
+        {
+            IQueryable<AgendaQuadra> query = _context.AgendaQuadras;
+
+            var agendaQuadra = query.AsNoTracking()
+                    .Where(X => X.QuadraId == idQuadra);
+
+            if (dia != null)
+            {
+                agendaQuadra = agendaQuadra.Where(X => X.HoraInicio.Date == dia.Value.Date); ;
+            }
+
+            return agendaQuadra.ToArray();
+        }
+
     }
 }

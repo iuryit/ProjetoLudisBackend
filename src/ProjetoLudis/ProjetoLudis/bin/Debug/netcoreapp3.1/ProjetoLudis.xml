@@ -4,5 +4,70 @@
         <name>ProjetoLudis</name>
     </assembly>
     <members>
+        <member name="M:ProjetoLudis.Controllers.QuadraController.Registrar(ProjetoLudis.Dtos.QuadraRegistrar)">
+            <summary>
+            Cadastro de quadra - Comerciante
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ProjetoLudis.Controllers.QuadraController.GetQuadraComerciante">
+            <summary>
+            Consulta de quadras por comerciante - Comerciante
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ProjetoLudis.Controllers.QuadraController.Put(System.Int32,ProjetoLudis.Tabelas.Quadra)">
+            <summary>
+            Alteracao de quadra - Comerciante
+            </summary>
+            <param name="id"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ProjetoLudis.Controllers.QuadraController.Patch(System.Int32,ProjetoLudis.Tabelas.Quadra)">
+            <summary>
+            Alteracao parcial quadra - Comerciante
+            </summary>
+            <param name="id"></param>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ProjetoLudis.Controllers.QuadraController.Delete(System.Int32)">
+            <summary>
+            Deleção de quadra - Comerciante
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ProjetoLudis.Controllers.QuadraController.Get">
+            <summary>
+            Consulta geral de quadra - Comerciante/Esportista
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ProjetoLudis.Controllers.QuadraController.Agendar(ProjetoLudis.Dtos.QuadraAgendar)">
+            <summary>
+            Agendamento de horario em quadra - Esportista
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ProjetoLudis.Controllers.QuadraController.GetQuadraLocalizacao(System.String,System.String)">
+            <summary>
+            Consulta de quadra por localização - Esportista
+            </summary>
+            <param name="cidade"></param>
+            <param name="nome"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ProjetoLudis.Controllers.QuadraController.GetQuadraHorarios(System.Int32,System.Nullable{System.DateTime})">
+            <summary>
+            Consulta de horarios agendados em determinada quadra - Esportista
+            </summary>
+            <param name="idQuadra"></param>
+            <param name="dia"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

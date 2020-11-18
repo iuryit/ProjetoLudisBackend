@@ -23,6 +23,7 @@ using ProjetoLudis.Tabelas;
 using ProjetoLudis.Properties;
 using ProjetoLudis.Options;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 
 namespace ProjetoLudis
 {
@@ -48,6 +49,17 @@ namespace ProjetoLudis
                          .AddRoles<IdentityRole>()
                          .AddEntityFrameworkStores<Context>()
                          .AddDefaultTokenProviders();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Default Password settings.
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 6;
+                options.Password.RequiredUniqueChars = 0;
+            });
 
             services.AddSwaggerGen(x =>  {
                 x.SwaggerDoc("v1", new OpenApiInfo { Title = "AppLudis", Version = "v1" });
@@ -105,6 +117,9 @@ namespace ProjetoLudis
                 };
             });
             services.AddControllers();
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<AuthenticatedUser>();
 
         }
 
